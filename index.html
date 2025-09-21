@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery List Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { 
+            --primary: #00ffc6; 
+            --primary-dark: #00bfa1;
+            --secondary: #6a11cb;
+            --secondary-dark: #2575fc;
+            --accent: #ff6ec7;
+            --accent-dark: #d845a5;
+            --warning: #ff4d6d;
+            --warning-dark: #d32f2f;
+            --text: #e0e0e0;
+            --text-dark: #111;
+            --bg: #0a0b1b;
+            --panel: rgba(255, 255, 255, 0.05);
+            --error: #ff4757;
+            --success: #2ed573;
+            
+            --radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --transition: all 0.2s ease-in-out;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg) 0%, #1a1c33 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            font-size: 14px;
+        }
+
+        .container {
+            background: var(--panel);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 30px;
+            width: 100%;
+            max-width: 1200px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary);
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0, 255, 198, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .selector-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 10px 16px;
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: var(--transition);
+        }
+
+        .selector-group:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .selector-label {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        select, input[type="text"] {
+            padding: 8px 12px;
+            border-radius: var(--radius);
+            border: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            font-size: 0.9rem;
+            transition: var(--transition);
+            outline: none;
+            min-width: 100px;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border: 1px solid var(--primary);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .btn-add {
+            background: var(--primary);
+            color: var(--text-dark);
+            width: 100%;
+            margin-bottom: 16px;
+            font-size: 1rem;
+        }
+
+        .btn-add:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-save {
+            background: var(--secondary);
+            color: var(--text);
+        }
+
+        .btn-save:hover {
+            background: var(--secondary-dark);
+        }
+
+        .btn-delete {
+            background: var(--warning);
+            color: var(--text);
+        }
+
+        .btn-cross {
+            background: var(--warning);
+            color: var(--text);
+            padding: 4px 6px;         /* Smaller padding */
+            font-size: 0.8rem;        /* Smaller text/icon size */
+            line-height: 1;           /* Tighter vertical spacing */
+            width: 28px;              /* Optional: fixed width */
+            height: 28px;             /* Optional: fixed height */
+        }
+
+
+        .btn-delete:hover {
+            background: var(--warning-dark);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 20px;
+        }
+
+        .grocery-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+            font-size: 0.9rem;
+            table-layout: fixed;
+        }
+
+        .grocery-table th, .grocery-table td {
+            padding: 10px 8px;
+            text-align: center;
+            color: var(--text);
+        }
+
+        .grocery-table th {
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--primary);
+            position: sticky;
+            top: 0;
+            text-transform: uppercase;
+        }
+
+        .grocery-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .grocery-table tr.completed td {
+            opacity: 0.6;
+            text-decoration: line-through;
+            transition: 0.3s;
+        }
+
+        .grocery-table tr.completed {
+            box-shadow: 0 0 4px var(--primary);
+            background: rgba(0, 255, 198, 0.1);
+        }
+
+        input[type="number"], input[type="text"] {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius);
+            padding: 4px 6px;
+            color: var(--text);
+            width: 100%;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        input[type="checkbox"] {
+            transform: scale(1.2);
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .summary {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .summary h3 {
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .total {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: var(--primary);
+            border-top: 1px dashed rgba(255, 255, 255, 0.2);
+            padding-top: 8px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .saved-lists {
+            border-radius: var(--radius);
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .saved-lists h3 {
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            margin-bottom: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+        }
+
+        .list-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .message {
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .error {
+            background: rgba(255, 71, 87, 0.1);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .success {
+            background: rgba(46, 213, 115, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .header-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .selector-group {
+                justify-content: space-between;
+            }
+            
+            .grocery-table {
+                min-width: unset;
+                font-size: 0.8rem;
+            }
+            
+            .grocery-table th, .grocery-table td {
+                padding: 8px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-shopping-basket"></i> Grocery List Manager</h1>
+            <div class="header-controls">
+                <div class="selector-group">
+                    <span class="selector-label">Month:</span>
+                    <select id="month"></select>
+                </div>
+                <div class="selector-group">
+                    <span class="selector-label">Year:</span>
+                    <select id="year"></select>
+                </div>
+                <div class="selector-group">
+                    <span class="selector-label">Store:</span>
+                    <input type="text" id="supermarket" placeholder="e.g., D-Mart">
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <button class="btn btn-add" id="addRow"><i class="fas fa-plus"></i> Add Item</button>
+            
+            <div class="table-container">
+                <table class="grocery-table">
+                    <colgroup>
+                        <col style="width:20px">   <!-- Checkbox -->
+                        <col style="width:200px">  <!-- Description -->
+                        <col style="width:50px">   <!-- Qty -->
+                        <col style="width:90px">   <!-- UoM (Increased from 10px) -->
+                        <col style="width:70px">   <!-- MRP -->
+                        <col style="width:70px">   <!-- Rate -->
+                        <col style="width:60px">   <!-- Disc % -->
+                        <col style="width:50px">   <!-- GST % -->
+                        <col style="width:80px">   <!-- GST Amt -->
+                        <col style="width:70px">   <!-- Total -->
+                        <col style="width:50px">   <!-- Actions -->
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Item Description</th>
+                            <th>Qty</th>
+                            <th>UoM</th>
+                            <th>MRP (₹)</th>
+                            <th>Rate (₹)</th>
+                            <th>Disc %</th>
+                            <th>GST %</th>
+                            <th>GST Amt (₹)</th>
+                            <th>Total (₹)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="groceryTableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="summary">
+                <h3>Order Summary</h3>
+                <div class="summary-row"><span>Subtotal:</span><span id="subtotal">0.00</span></div>
+                <div class="summary-row"><span>Total GST:</span><span id="totalGst">0.00</span></div>
+                <div class="summary-row total"><span>Total Amount:</span><span id="totalAmount">0.00</span></div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-save" id="saveList"><i class="fas fa-save"></i> Save List</button>
+                <button class="btn btn-delete" id="clearList"><i class="fas fa-trash"></i> Clear All</button>
+            </div>
+
+            <div class="saved-lists">
+                <h3><i class="fas fa-history"></i> Saved Lists</h3>
+                <div id="savedListsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const tableBody = document.getElementById('groceryTableBody');
+            const addRowBtn = document.getElementById('addRow');
+            const saveListBtn = document.getElementById('saveList');
+            const clearListBtn = document.getElementById('clearList');
+            const monthSelect = document.getElementById('month');
+            const yearSelect = document.getElementById('year');
+            const supermarketInput = document.getElementById('supermarket');
+            const savedListsContainer = document.getElementById('savedListsContainer');
+            
+            // Initialize month and year dropdowns
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const now = new Date();
+            
+            months.forEach((month, index) => {
+                const option = document.createElement('option');
+                option.value = index + 1;
+                option.textContent = month;
+                monthSelect.appendChild(option);
+            });
+            monthSelect.value = now.getMonth() + 1;
+            
+            const currentYear = now.getFullYear();
+            for (let i = currentYear - 1; i <= currentYear + 2; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                yearSelect.appendChild(option);
+            }
+            yearSelect.value = currentYear;
+            
+            // Add a new row to the table
+            function addNewRow(itemData = null) {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td><input type="checkbox" class="item-check"></td>
+                    <td><input type="text" class="description" value="${itemData?.description || ''}" placeholder="Item name"></td>
+                    <td><input type="number" class="quantity" min="1" value="${itemData?.quantity || 1}"></td>
+                    <td><input type="text" class="uom" value="${itemData?.uom || ''}" placeholder="Kg"></td>
+                    <td><input type="number" class="mrp" min="0" value="${itemData?.mrp || 0}" step="1"></td>
+                    <td><input type="number" class="rate" min="0" value="${itemData?.rate || 0}" step="1"></td>
+                    <td class="discount-percent">0%</td>
+                    <td><input type="number" class="gst-percent" min="0" value="${itemData?.gst || 5}" step="1"></td>
+                    <td class="gst-amount">0.00</td>
+                    <td class="total-amount">0.00</td>
+                    <td class="list-actions">
+                        <button class="btn btn-cross"><i class="fas fa-times"></i></button>
+                    </td>
+                `;
+                tableBody.appendChild(newRow);
+                
+                // Add event listeners to the new row
+                addRowListeners(newRow);
+                
+                // Calculate initial values for the new row
+                calculateRowTotal(newRow);
+                calculateTotals();
+                
+                return newRow;
+            }
+            
+            // Add event listeners to a row
+            function addRowListeners(row) {
+                // Add input event listeners to all input fields
+                row.querySelectorAll('input').forEach(input => {
+                    input.addEventListener('input', () => {
+                        calculateRowTotal(row);
+                        calculateTotals();
+                    });
+                });
+                
+                // Add change event listener to the checkbox
+                row.querySelector('.item-check').addEventListener('change', () => {
+                    row.classList.toggle('completed');
+                    calculateTotals();
+                });
+                
+                // Add click event listener to the delete button
+                row.querySelector('.btn-delete').addEventListener('click', () => {
+                    row.remove();
+                    calculateTotals();
+                });
+            }
+            
+            // Calculate totals for a single row
+            function calculateRowTotal(row) {
+                const qty = parseFloat(row.querySelector('.quantity').value) || 0;
+                const rate = parseFloat(row.querySelector('.rate').value) || 0;
+                const mrp = parseFloat(row.querySelector('.mrp').value) || 0;
+                const gst = parseFloat(row.querySelector('.gst-percent').value) || 0;
+                
+                // Calculate values
+                const total = qty * rate;
+                const discount = mrp > 0 ? ((mrp - rate) / mrp) * 100 : 0;
+                const gstAmt = total * (gst / 100);
+                const totalAmt = total + gstAmt;
+                
+                // Update the row
+                row.querySelector('.discount-percent').textContent = `${Math.round(discount)}%`;
+                row.querySelector('.gst-amount').textContent = gstAmt.toFixed(2);
+                row.querySelector('.total-amount').textContent = totalAmt.toFixed(2);
+            }
+            
+            // Calculate overall totals
+            function calculateTotals() {
+                let subtotal = 0;
+                let totalGst = 0;
+                let totalAmount = 0;
+                
+                // Loop through all rows
+                tableBody.querySelectorAll('tr').forEach(row => {
+                    const qty = parseFloat(row.querySelector('.quantity').value) || 0;
+                    const rate = parseFloat(row.querySelector('.rate').value) || 0;
+                    const gst = parseFloat(row.querySelector('.gst-percent').value) || 0;
+                    
+                    const rowTotal = qty * rate;
+                    const rowGst = rowTotal * (gst / 100);
+                    
+                    subtotal += rowTotal;
+                    totalGst += rowGst;
+                    totalAmount += rowTotal + rowGst;
+                });
+                
+                // Update the summary
+                document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+                document.getElementById('totalGst').textContent = totalGst.toFixed(2);
+                document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+            }
+            
+            // Render saved lists
+            function renderSavedLists() {
+                savedListsContainer.innerHTML = '';
+                
+                // Get all keys from localStorage that start with 'groceryList-'
+                const listKeys = Object.keys(localStorage).filter(key => key.startsWith('groceryList-'));
+                
+                if (listKeys.length === 0) {
+                    savedListsContainer.innerHTML = '<div class="message">No saved lists yet</div>';
+                    return;
+                }
+                
+                // Create a list item for each saved list
+                listKeys.forEach(key => {
+                    const listData = JSON.parse(localStorage.getItem(key));
+                    const listName = key.replace('groceryList-', '');
+                    
+                    const listItem = document.createElement('div');
+                    listItem.className = 'list-item';
+                    listItem.innerHTML = `
+                        <span class="list-name">${listName}</span>
+                        <div class="list-actions">
+                            <button class="btn btn-save load-btn">Load</button>
+                            <button class="btn btn-delete delete-btn">Delete</button>
+                        </div>
+                    `;
+                    
+                    // Add event listeners
+                    listItem.querySelector('.load-btn').addEventListener('click', () => {
+                        loadList(key, listData);
+                    });
+                    
+                    listItem.querySelector('.delete-btn').addEventListener('click', () => {
+                        if (confirm('Are you sure you want to delete this list?')) {
+                            localStorage.removeItem(key);
+                            renderSavedLists();
+                        }
+                    });
+                    
+                    savedListsContainer.appendChild(listItem);
+                });
+            }
+            
+            // Load a saved list
+            function loadList(key, listData) {
+                // Clear the current table
+                tableBody.innerHTML = '';
+                
+                // Add rows from the saved list
+                if (listData.items && Array.isArray(listData.items)) {
+                    listData.items.forEach(item => {
+                        addNewRow(item);
+                    });
+                }
+                
+                // Update supermarket input if available
+                if (listData.supermarket) {
+                    supermarketInput.value = listData.supermarket;
+                }
+                
+                // Update month and year selects if available
+                if (listData.month) {
+                    monthSelect.value = listData.month;
+                }
+                
+                if (listData.year) {
+                    yearSelect.value = listData.year;
+                }
+                
+                calculateTotals();
+                
+                // Show success message
+                showMessage('List loaded successfully', false);
+            }
+            
+            // Show a message
+            function showMessage(message, isError = false) {
+                // Remove any existing message
+                const existingMessage = document.querySelector('.message');
+                if (existingMessage) {
+                    existingMessage.remove();
+                }
+                
+                // Create new message
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isError ? 'error' : 'success'}`;
+                messageDiv.textContent = message;
+                
+                // Insert after the controls
+                document.querySelector('.controls').after(messageDiv);
+                
+                // Auto remove after 3 seconds
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.remove();
+                    }
+                }, 3000);
+            }
+            
+            // Event listeners
+            addRowBtn.addEventListener('click', () => {
+                addNewRow();
+            });
+            
+            clearListBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all items?')) {
+                    tableBody.innerHTML = '';
+                    addNewRow(); // Add an empty row
+                    calculateTotals();
+                }
+            });
+            
+            saveListBtn.addEventListener('click', () => {
+                const items = [];
+                
+                // Collect all items from the table
+                tableBody.querySelectorAll('tr').forEach(row => {
+                    items.push({
+                        description: row.querySelector('.description').value,
+                        quantity: row.querySelector('.quantity').value,
+                        uom: row.querySelector('.uom').value,
+                        mrp: row.querySelector('.mrp').value,
+                        rate: row.querySelector('.rate').value,
+                        gst: row.querySelector('.gst-percent').value,
+                        completed: row.querySelector('.item-check').checked
+                    });
+                });
+                
+                // Check if there are any items
+                if (items.length === 0) {
+                    showMessage('Please add at least one item before saving', true);
+                    return;
+                }
+                
+                // Create list data object
+                const listData = {
+                    items: items,
+                    supermarket: supermarketInput.value,
+                    month: monthSelect.value,
+                    year: yearSelect.value,
+                    savedAt: new Date().toISOString()
+                };
+                
+                // Generate a list name
+                const listName = `List-${yearSelect.value}-${monthSelect.value}-${supermarketInput.value || 'Store'}`;
+                const storageKey = `groceryList-${listName}`;
+                
+                // Save to localStorage
+                localStorage.setItem(storageKey, JSON.stringify(listData));
+                
+                // Update the saved lists display
+                renderSavedLists();
+                
+                // Show success message
+                showMessage('List saved successfully', false);
+            });
+            
+            // Initialize the app
+            addNewRow(); // Add initial empty row
+            renderSavedLists(); // Load any saved lists
+        });
+    </script>
+</body>
+</html>
