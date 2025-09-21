@@ -107,6 +107,19 @@
             min-width: 60px;
         }
 
+        /* List Name Input */
+        .list-name-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 1rem;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+
         /* Buttons */
         .btn {
             padding: 10px 14px;
@@ -164,7 +177,7 @@
             margin-bottom: 20px;
         }
 
-        /* Item Cards */
+        /* Item Cards - More Compact */
         .items-container {
             margin-bottom: 20px;
         }
@@ -172,8 +185,8 @@
         .item-card {
             background: var(--card-bg);
             border-radius: var(--radius);
-            padding: 16px;
-            margin-bottom: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
             border: 1px solid var(--border);
             transition: var(--transition);
             position: relative;
@@ -189,31 +202,31 @@
         .item-header {
             display: flex;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .item-check {
-            transform: scale(1.4);
+            transform: scale(1.2);
             accent-color: var(--primary);
-            margin-right: 12px;
+            margin-right: 10px;
         }
 
         .item-title {
             flex: 1;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .item-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         .action-btn {
             background: transparent;
             border: none;
             color: var(--text-light);
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
             padding: 4px;
         }
@@ -221,7 +234,7 @@
         .item-details {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 8px;
         }
 
         .detail-group {
@@ -230,20 +243,20 @@
         }
 
         .detail-label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-light);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .detail-value {
             font-weight: 500;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         /* Summary */
         .summary {
             background: var(--card-bg);
-            padding: 20px;
+            padding: 16px;
             border-radius: var(--radius);
             margin-bottom: 20px;
             border: 1px solid var(--border);
@@ -252,30 +265,30 @@
 
         .summary h3 {
             color: var(--accent);
-            margin-bottom: 16px;
-            font-size: 1.2rem;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 1rem;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
         }
 
         .total {
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--primary);
             border-top: 1px dashed var(--border);
-            padding-top: 10px;
-            margin-top: 10px;
+            padding-top: 8px;
+            margin-top: 8px;
         }
 
         /* Saved Lists */
         .saved-lists {
             border-radius: var(--radius);
-            padding: 20px;
+            padding: 16px;
             background: var(--card-bg);
             border: 1px solid var(--border);
             margin-bottom: 80px;
@@ -284,8 +297,8 @@
 
         .saved-lists h3 {
             color: var(--accent);
-            margin-bottom: 16px;
-            font-size: 1.2rem;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -302,21 +315,34 @@
             border: 1px solid var(--border);
         }
 
+        .list-info {
+            flex: 1;
+        }
+
         .list-name {
             font-weight: 600;
             color: var(--primary);
-            font-size: 1rem;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
         }
 
         .list-details {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-light);
-            margin-top: 4px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .list-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .list-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         /* Bottom Navigation */
@@ -343,7 +369,7 @@
             color: var(--text-light);
             font-size: 0.9rem;
             cursor: pointer;
-            padding: 8px 16px;
+            padding: 8px 12px;
             border-radius: var(--radius-sm);
             transition: var(--transition);
         }
@@ -354,7 +380,7 @@
         }
 
         .nav-btn i {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-bottom: 4px;
         }
 
@@ -370,7 +396,7 @@
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            padding: 20px;
+            padding: 16px;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
@@ -395,13 +421,13 @@
         }
 
         .modal-header {
-            padding: 16px 20px;
+            padding: 16px;
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
         }
 
         .modal-title {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: var(--primary);
         }
 
@@ -409,46 +435,71 @@
             background: none;
             border: none;
             color: var(--text-light);
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             cursor: pointer;
             position: absolute;
-            top: 16px;
-            right: 20px;
+            top: 14px;
+            right: 16px;
         }
 
         .modal-body {
-            padding: 20px;
+            padding: 16px;
             overflow-y: auto;
             flex-grow: 1;
         }
 
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: var(--text);
             font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .form-input {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border-radius: var(--radius-sm);
             border: 1px solid var(--border);
             background: var(--card-bg);
             color: var(--text);
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         .modal-footer {
-            padding: 16px 20px;
+            padding: 16px;
             border-top: 1px solid var(--border);
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex-shrink: 0;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--success);
+            color: white;
+            padding: 16px 24px;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
         }
 
         /* Message */
@@ -516,7 +567,7 @@
             }
             
             .detail-value {
-                font-size: 0.9rem;
+                font-size: 0.85rem;
             }
             
             .filter-item {
@@ -525,11 +576,26 @@
             }
             
             .modal-body {
-                padding: 16px;
+                padding: 12px;
             }
             
             .modal-footer {
-                padding: 12px 16px;
+                padding: 12px;
+            }
+            
+            .list-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .list-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .list-actions .btn {
+                flex: 1;
             }
         }
     </style>
@@ -557,6 +623,8 @@
                 </div>
             </div>
 
+            <input type="text" class="list-name-input" id="listName" placeholder="List Name (optional)">
+
             <button class="btn btn-add" id="addItemBtn"><i class="fas fa-plus"></i> Add Item</button>
             
             <div class="items-container" id="itemsContainer">
@@ -570,6 +638,7 @@
             <div class="summary">
                 <h3>Order Summary</h3>
                 <div class="summary-row"><span>Subtotal:</span><span id="subtotal">0.00</span></div>
+                <div class="summary-row"><span>Total Discount:</span><span id="totalDiscount">0.00</span></div>
                 <div class="summary-row"><span>Total GST:</span><span id="totalGst">0.00</span></div>
                 <div class="summary-row total"><span>Total Amount:</span><span id="totalAmount">0.00</span></div>
             </div>
@@ -725,6 +794,12 @@
         </div>
     </div>
 
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-text">List saved successfully!</span>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // DOM elements
@@ -743,6 +818,7 @@
             const clearListBtn = document.getElementById('clearList');
             const monthSelect = document.getElementById('month');
             const yearSelect = document.getElementById('year');
+            const listNameInput = document.getElementById('listName');
             const summaryMonthSelect = document.getElementById('summary-month');
             const summaryYearSelect = document.getElementById('summary-year');
             const summaryStoreSelect = document.getElementById('summary-store');
@@ -750,6 +826,8 @@
             const savedStoreSelect = document.getElementById('saved-store');
             const summaryTableBody = document.getElementById('summary-table-body');
             const storeSummaryBody = document.getElementById('store-summary-body');
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
             
             // Form inputs
             const itemDescription = document.getElementById('itemDescription');
@@ -772,7 +850,9 @@
                 // Initialize date selectors
                 initDateSelectors();
                 
-                loadItems();
+                // Don't load any items by default
+                items = [];
+                renderItems();
                 updateSummary();
                 renderSavedLists();
                 updateSummaryFilters();
@@ -898,6 +978,16 @@
                 });
             }
             
+            // Show notification
+            function showNotification(message) {
+                notificationText.textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 2000);
+            }
+            
             // Switch between tabs
             function switchTab(tabId) {
                 // Hide all tab contents
@@ -1014,12 +1104,14 @@
             // Calculate item totals
             function calculateItemTotals(item) {
                 const total = item.quantity * item.rate;
-                const discount = item.mrp > 0 ? ((item.mrp - item.rate) / item.mrp) * 100 : 0;
+                const discountAmount = item.mrp > 0 ? (item.mrp - item.rate) * item.quantity : 0;
+                const discountPercent = item.mrp > 0 ? ((item.mrp - item.rate) / item.mrp) * 100 : 0;
                 const gstAmt = total * (item.gst / 100);
                 const totalAmt = total + gstAmt;
                 
                 return {
-                    discount: Math.round(discount),
+                    discount: Math.round(discountPercent),
+                    discountAmount: discountAmount.toFixed(2),
                     gstAmt: gstAmt.toFixed(2),
                     totalAmt: totalAmt.toFixed(2)
                 };
@@ -1101,21 +1193,25 @@
             // Update summary
             function updateSummary() {
                 let subtotal = 0;
+                let totalDiscount = 0;
                 let totalGst = 0;
                 let totalAmount = 0;
                 
                 items.forEach(item => {
                     if (!item.completed) {
                         const total = item.quantity * item.rate;
+                        const discountAmount = item.mrp > 0 ? (item.mrp - item.rate) * item.quantity : 0;
                         const gstAmt = total * (item.gst / 100);
                         
                         subtotal += total;
+                        totalDiscount += discountAmount;
                         totalGst += gstAmt;
                         totalAmount += total + gstAmt;
                     }
                 });
                 
                 document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+                document.getElementById('totalDiscount').textContent = totalDiscount.toFixed(2);
                 document.getElementById('totalGst').textContent = totalGst.toFixed(2);
                 document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
             }
@@ -1147,11 +1243,13 @@
                     supermarket: supermarketInput.value,
                     month: monthSelect.value,
                     year: yearSelect.value,
-                    savedAt: new Date().toISOString()
+                    listName: listNameInput.value || '',
+                    savedAt: new Date().toISOString(),
+                    totalAmount: document.getElementById('totalAmount').textContent
                 };
                 
                 // Generate a list name
-                const baseName = `${yearSelect.value}-${monthSelect.value}-${supermarketInput.value || 'Store'}`;
+                const baseName = listNameInput.value || `${yearSelect.value}-${monthSelect.value}-${supermarketInput.value || 'Store'}`;
                 let storageKey = `groceryList-${baseName}`;
                 
                 // If we're updating an existing list, use its key
@@ -1169,16 +1267,28 @@
                 // Save to localStorage
                 localStorage.setItem(storageKey, JSON.stringify(listData));
                 
+                // Clear current list
+                items = [];
+                currentListKey = null;
+                listNameInput.value = '';
+                supermarketInput.value = '';
+                
+                // Reset to current month/year
+                const now = new Date();
+                monthSelect.value = now.getMonth() + 1;
+                yearSelect.value = now.getFullYear();
+                
+                saveItems();
+                renderItems();
+                updateSummary();
+                
                 // Update the saved lists display
                 renderSavedLists();
                 updateSummaryFilters();
                 updateSavedFilters();
                 
-                // Show success message
-                showMessage(currentListKey ? 'List updated successfully' : 'List saved successfully');
-                
-                // Set as current list
-                currentListKey = storageKey;
+                // Show notification in the middle of the screen
+                showNotification('List saved successfully!');
             }
             
             // Clear current list
@@ -1186,6 +1296,7 @@
                 if (confirm('Are you sure you want to clear all items?')) {
                     items = [];
                     currentListKey = null;
+                    listNameInput.value = '';
                     saveItems();
                     renderItems();
                     updateSummary();
@@ -1253,13 +1364,32 @@
                     const listName = key.replace('groceryList-', '');
                     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
                     const monthName = months[listData.month - 1] || 'Unknown';
+                    const savedDate = new Date(listData.savedAt);
+                    const formattedDate = savedDate.toLocaleDateString() + ' ' + savedDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                     
                     const listItem = document.createElement('div');
                     listItem.className = 'list-item';
                     listItem.innerHTML = `
-                        <div>
-                            <div class="list-name">${listData.supermarket || 'Unknown Store'}</div>
-                            <div class="list-details">${monthName} ${listData.year} - ${listName.includes('-') ? 'List ' + listName.split('-').pop() : ''}</div>
+                        <div class="list-info">
+                            <div class="list-name">${listData.listName || listData.supermarket || 'Unnamed List'}</div>
+                            <div class="list-details">
+                                <span class="list-detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    ${monthName} ${listData.year}
+                                </span>
+                                <span class="list-detail-item">
+                                    <i class="fas fa-store"></i>
+                                    ${listData.supermarket || 'Unknown Store'}
+                                </span>
+                                <span class="list-detail-item">
+                                    <i class="fas fa-receipt"></i>
+                                    ₹${listData.totalAmount || '0.00'}
+                                </span>
+                                <span class="list-detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    ${formattedDate}
+                                </span>
+                            </div>
                         </div>
                         <div class="list-actions">
                             <button class="btn btn-save load-btn">Load</button>
@@ -1312,6 +1442,11 @@
                 
                 if (listData.year) {
                     yearSelect.value = listData.year;
+                }
+                
+                // Update list name if available
+                if (listData.listName) {
+                    listNameInput.value = listData.listName;
                 }
                 
                 // Set as current list
