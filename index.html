@@ -109,7 +109,7 @@
 
         /* Buttons */
         .btn {
-            padding: 12px 16px;
+            padding: 10px 14px;
             border-radius: var(--radius-sm);
             font-weight: 500;
             cursor: pointer;
@@ -118,8 +118,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            font-size: 1rem;
+            gap: 6px;
+            font-size: 0.9rem;
         }
 
         .btn-add {
@@ -127,7 +127,7 @@
             color: white;
             width: 100%;
             margin-bottom: 16px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             box-shadow: var(--shadow);
         }
 
@@ -139,6 +139,7 @@
             background: var(--secondary);
             color: white;
             box-shadow: var(--shadow);
+            flex: 1;
         }
 
         .btn-save:hover {
@@ -149,10 +150,18 @@
             background: var(--warning);
             color: white;
             box-shadow: var(--shadow);
+            flex: 1;
         }
 
         .btn-delete:hover {
             background: var(--warning-dark);
+        }
+
+        /* Side-by-side buttons */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         /* Item Cards */
@@ -263,29 +272,6 @@
             margin-top: 10px;
         }
 
-        /* Summary Table */
-        .summary-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 16px;
-        }
-
-        .summary-table th, .summary-table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .summary-table th {
-            background-color: rgba(76, 175, 80, 0.1);
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .summary-table tr:last-child td {
-            border-bottom: none;
-        }
-
         /* Saved Lists */
         .saved-lists {
             border-radius: var(--radius);
@@ -372,7 +358,7 @@
             margin-bottom: 4px;
         }
 
-        /* Modal */
+        /* Modal - Improved for mobile */
         .modal {
             position: fixed;
             top: 0;
@@ -398,20 +384,20 @@
         .modal-content {
             background: var(--card-bg);
             border-radius: var(--radius);
-            padding: 24px;
             width: 100%;
             max-width: 400px;
-            max-height: 80vh;
-            overflow-y: auto;
+            max-height: 85vh;
+            overflow: hidden;
             border: 1px solid var(--border);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
         }
 
         .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
         }
 
         .modal-title {
@@ -425,6 +411,15 @@
             color: var(--text-light);
             font-size: 1.5rem;
             cursor: pointer;
+            position: absolute;
+            top: 16px;
+            right: 20px;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
         }
 
         .form-group {
@@ -448,10 +443,12 @@
             font-size: 1rem;
         }
 
-        .form-actions {
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
             display: flex;
             gap: 12px;
-            margin-top: 24px;
+            flex-shrink: 0;
         }
 
         /* Message */
@@ -526,6 +523,14 @@
                 flex: 1;
                 min-width: 100px;
             }
+            
+            .modal-body {
+                padding: 16px;
+            }
+            
+            .modal-footer {
+                padding: 12px 16px;
+            }
         }
     </style>
 </head>
@@ -569,7 +574,7 @@
                 <div class="summary-row total"><span>Total Amount:</span><span id="totalAmount">0.00</span></div>
             </div>
 
-            <div class="controls">
+            <div class="button-group">
                 <button class="btn btn-save" id="saveList"><i class="fas fa-save"></i> Save List</button>
                 <button class="btn btn-delete" id="clearList"><i class="fas fa-trash"></i> Clear All</button>
             </div>
@@ -687,31 +692,33 @@
                 <h2 class="modal-title" id="modalTitle">Add Item</h2>
                 <button class="close-modal" id="closeModal">&times;</button>
             </div>
-            <div class="form-group">
-                <label class="form-label" for="itemDescription">Item Name</label>
-                <input type="text" class="form-input" id="itemDescription" placeholder="Enter item name">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="itemDescription">Item Name</label>
+                    <input type="text" class="form-input" id="itemDescription" placeholder="Enter item name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="itemQuantity">Quantity</label>
+                    <input type="number" class="form-input" id="itemQuantity" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="itemUom">Unit</label>
+                    <input type="text" class="form-input" id="itemUom" placeholder="e.g., kg, pcs">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="itemMrp">MRP (₹)</label>
+                    <input type="number" class="form-input" id="itemMrp" min="0" value="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="itemRate">Rate (₹)</label>
+                    <input type="number" class="form-input" id="itemRate" min="0" value="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="itemGst">GST (%)</label>
+                    <input type="number" class="form-input" id="itemGst" min="0" value="5" step="1">
+                </div>
             </div>
-            <div class="form-group">
-                <label class="form-label" for="itemQuantity">Quantity</label>
-                <input type="number" class="form-input" id="itemQuantity" min="1" value="1">
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="itemUom">Unit</label>
-                <input type="text" class="form-input" id="itemUom" placeholder="e.g., kg, pcs">
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="itemMrp">MRP (₹)</label>
-                <input type="number" class="form-input" id="itemMrp" min="0" value="0" step="0.01">
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="itemRate">Rate (₹)</label>
-                <input type="number" class="form-input" id="itemRate" min="0" value="0" step="0.01">
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="itemGst">GST (%)</label>
-                <input type="number" class="form-input" id="itemGst" min="0" value="5" step="1">
-            </div>
-            <div class="form-actions">
+            <div class="modal-footer">
                 <button class="btn btn-delete" id="cancelItem">Cancel</button>
                 <button class="btn btn-save" id="saveItem">Save Item</button>
             </div>
@@ -758,6 +765,7 @@
             // State
             let currentItemId = null;
             let items = [];
+            let currentListKey = null; // Track the currently loaded list
             
             // Initialize the app
             function init() {
@@ -1126,7 +1134,7 @@
                 }
             }
             
-            // Save current list
+            // Save current list (with overwrite functionality)
             function saveCurrentList() {
                 if (items.length === 0) {
                     showMessage('Please add at least one item before saving', true);
@@ -1142,15 +1150,20 @@
                     savedAt: new Date().toISOString()
                 };
                 
-                // Generate a list name with unique ID if needed
-                const baseName = `groceryList-${yearSelect.value}-${monthSelect.value}-${supermarketInput.value || 'Store'}`;
-                let storageKey = baseName;
-                let counter = 1;
+                // Generate a list name
+                const baseName = `${yearSelect.value}-${monthSelect.value}-${supermarketInput.value || 'Store'}`;
+                let storageKey = `groceryList-${baseName}`;
                 
-                // Check if a list with this name already exists
-                while (localStorage.getItem(storageKey)) {
-                    storageKey = `${baseName}-${counter}`;
-                    counter++;
+                // If we're updating an existing list, use its key
+                if (currentListKey) {
+                    storageKey = currentListKey;
+                } else {
+                    // Check if a list with this name already exists
+                    let counter = 1;
+                    while (localStorage.getItem(storageKey)) {
+                        storageKey = `groceryList-${baseName}-${counter}`;
+                        counter++;
+                    }
                 }
                 
                 // Save to localStorage
@@ -1162,13 +1175,17 @@
                 updateSavedFilters();
                 
                 // Show success message
-                showMessage('List saved successfully');
+                showMessage(currentListKey ? 'List updated successfully' : 'List saved successfully');
+                
+                // Set as current list
+                currentListKey = storageKey;
             }
             
             // Clear current list
             function clearCurrentList() {
                 if (confirm('Are you sure you want to clear all items?')) {
                     items = [];
+                    currentListKey = null;
                     saveItems();
                     renderItems();
                     updateSummary();
@@ -1258,6 +1275,10 @@
                     listItem.querySelector('.delete-btn').addEventListener('click', () => {
                         if (confirm('Are you sure you want to delete this list?')) {
                             localStorage.removeItem(key);
+                            // If we're deleting the current list, clear the currentListKey
+                            if (currentListKey === key) {
+                                currentListKey = null;
+                            }
                             renderSavedLists();
                             updateSummaryFilters();
                             updateSavedFilters();
@@ -1292,6 +1313,9 @@
                 if (listData.year) {
                     yearSelect.value = listData.year;
                 }
+                
+                // Set as current list
+                currentListKey = key;
                 
                 saveItems();
                 renderItems();
