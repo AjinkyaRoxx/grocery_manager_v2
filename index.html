@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grocery List Manager</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Libraries for export functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root { 
             --primary: #4CAF50; 
@@ -170,11 +174,29 @@
             background: var(--warning-dark);
         }
 
+        .btn-export {
+            background: var(--accent);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-export:hover {
+            background: var(--accent-dark);
+        }
+
         /* Side-by-side buttons */
         .button-group {
             display: flex;
             gap: 12px;
             margin-bottom: 20px;
+        }
+
+        /* Export buttons */
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            justify-content: flex-end;
         }
 
         /* Item Cards - More Compact */
@@ -267,6 +289,9 @@
             color: var(--accent);
             margin-bottom: 12px;
             font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .summary-row {
@@ -283,6 +308,96 @@
             border-top: 1px dashed var(--border);
             padding-top: 8px;
             margin-top: 8px;
+        }
+
+        /* Summary Tables */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+
+        .summary-table th {
+            text-align: left;
+            padding: 10px 8px;
+            border-bottom: 2px solid var(--border);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .summary-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .summary-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .summary-table .number-cell {
+            text-align: right;
+            font-family: monospace;
+        }
+
+        .summary-table .left-align {
+            text-align: left;
+        }
+
+        .summary-table .center-align {
+            text-align: center;
+        }
+
+        .summary-table .right-align {
+            text-align: right;
+        }
+
+        /* Yearly Summary Card */
+        .yearly-summary {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .yearly-summary h3 {
+            color: white;
+            margin-bottom: 16px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .yearly-summary-content {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .yearly-stat {
+            text-align: center;
+        }
+
+        .yearly-stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .yearly-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .yearly-comparison {
+            grid-column: span 2;
+            text-align: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         /* Saved Lists */
@@ -502,6 +617,21 @@
             opacity: 1;
         }
 
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* Message */
         .message {
             text-align: center;
@@ -559,6 +689,14 @@
             .item-details {
                 grid-template-columns: repeat(3, 1fr);
             }
+            
+            .yearly-summary-content {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .yearly-comparison {
+                grid-column: span 4;
+            }
         }
 
         @media (max-width: 380px) {
@@ -596,6 +734,14 @@
             
             .list-actions .btn {
                 flex: 1;
+            }
+            
+            .yearly-summary-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .yearly-comparison {
+                grid-column: span 1;
             }
         }
     </style>
@@ -653,33 +799,47 @@
         <div class="tab-content" id="summary-tab">
             <div class="filter-row">
                 <div class="filter-item">
-                    <span class="filter-label">Month:</span>
-                    <select class="filter-select" id="summary-month">
-                        <option value="all">All</option>
-                    </select>
-                </div>
-                <div class="filter-item">
                     <span class="filter-label">Year:</span>
                     <select class="filter-select" id="summary-year">
                         <option value="all">All</option>
                     </select>
                 </div>
-                <div class="filter-item">
-                    <span class="filter-label">Store:</span>
-                    <select class="filter-select" id="summary-store">
-                        <option value="all">All</option>
-                    </select>
+            </div>
+
+            <!-- Yearly Summary Card -->
+            <div class="yearly-summary">
+                <h3><i class="fas fa-chart-line"></i> Yearly Summary</h3>
+                <div class="yearly-summary-content">
+                    <div class="yearly-stat">
+                        <div class="yearly-stat-value" id="yearly-total">₹0.00</div>
+                        <div class="yearly-stat-label">Total Spending</div>
+                    </div>
+                    <div class="yearly-stat">
+                        <div class="yearly-stat-value" id="yearly-lists">0</div>
+                        <div class="yearly-stat-label">Lists Created</div>
+                    </div>
+                    <div class="yearly-stat">
+                        <div class="yearly-stat-value" id="yearly-stores">0</div>
+                        <div class="yearly-stat-label">Stores Visited</div>
+                    </div>
+                    <div class="yearly-stat">
+                        <div class="yearly-stat-value" id="yearly-items">0</div>
+                        <div class="yearly-stat-label">Items Purchased</div>
+                    </div>
+                    <div class="yearly-comparison">
+                        <div id="yearly-comparison-text">No previous year data</div>
+                    </div>
                 </div>
             </div>
 
             <div class="summary">
-                <h3><i class="fas fa-chart-pie"></i> Monthly Summary</h3>
+                <h3><i class="fas fa-calendar"></i> Monthly Summary</h3>
                 <table class="summary-table">
                     <thead>
                         <tr>
-                            <th>Month</th>
-                            <th>Store</th>
-                            <th>Total Amount</th>
+                            <th class="left-align">Month</th>
+                            <th class="center-align">Store</th>
+                            <th class="right-align">Total Amount</th>
                         </tr>
                     </thead>
                     <tbody id="summary-table-body">
@@ -695,9 +855,9 @@
                 <table class="summary-table">
                     <thead>
                         <tr>
-                            <th>Store</th>
-                            <th>Total Amount</th>
-                            <th>Visit Count</th>
+                            <th class="left-align">Store</th>
+                            <th class="right-align">Total Amount</th>
+                            <th class="right-align">Visit Count</th>
                         </tr>
                     </thead>
                     <tbody id="store-summary-body">
@@ -724,6 +884,11 @@
                         <option value="all">All</option>
                     </select>
                 </div>
+            </div>
+
+            <div class="export-buttons">
+                <button class="btn btn-export" id="exportPdf"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                <button class="btn btn-export" id="exportExcel"><i class="fas fa-file-excel"></i> Export Excel</button>
             </div>
 
             <div class="saved-lists">
@@ -801,6 +966,9 @@
     </div>
 
     <script>
+        // Initialize jsPDF
+        window.jsPDF = window.jspdf.jsPDF;
+
         document.addEventListener('DOMContentLoaded', function() {
             // DOM elements
             const itemsContainer = document.getElementById('itemsContainer');
@@ -819,15 +987,22 @@
             const monthSelect = document.getElementById('month');
             const yearSelect = document.getElementById('year');
             const listNameInput = document.getElementById('listName');
-            const summaryMonthSelect = document.getElementById('summary-month');
             const summaryYearSelect = document.getElementById('summary-year');
-            const summaryStoreSelect = document.getElementById('summary-store');
             const savedYearSelect = document.getElementById('saved-year');
             const savedStoreSelect = document.getElementById('saved-store');
             const summaryTableBody = document.getElementById('summary-table-body');
             const storeSummaryBody = document.getElementById('store-summary-body');
             const notification = document.getElementById('notification');
             const notificationText = document.getElementById('notification-text');
+            const exportPdfBtn = document.getElementById('exportPdf');
+            const exportExcelBtn = document.getElementById('exportExcel');
+            
+            // Yearly summary elements
+            const yearlyTotal = document.getElementById('yearly-total');
+            const yearlyLists = document.getElementById('yearly-lists');
+            const yearlyStores = document.getElementById('yearly-stores');
+            const yearlyItems = document.getElementById('yearly-items');
+            const yearlyComparisonText = document.getElementById('yearly-comparison-text');
             
             // Form inputs
             const itemDescription = document.getElementById('itemDescription');
@@ -867,6 +1042,8 @@
                 closeModalBtn.addEventListener('click', closeModal);
                 saveListBtn.addEventListener('click', saveCurrentList);
                 clearListBtn.addEventListener('click', clearCurrentList);
+                exportPdfBtn.addEventListener('click', exportToPdf);
+                exportExcelBtn.addEventListener('click', exportToExcel);
                 
                 // Navigation events
                 navButtons.forEach(button => {
@@ -877,9 +1054,7 @@
                 });
                 
                 // Filter events
-                summaryMonthSelect.addEventListener('change', generateSummary);
                 summaryYearSelect.addEventListener('change', generateSummary);
-                summaryStoreSelect.addEventListener('change', generateSummary);
                 savedYearSelect.addEventListener('change', renderSavedLists);
                 savedStoreSelect.addEventListener('change', renderSavedLists);
                 
@@ -900,15 +1075,12 @@
                     option.value = index + 1;
                     option.textContent = month;
                     monthSelect.appendChild(option);
-                    // Also add to summary filter
-                    const summaryOption = option.cloneNode(true);
-                    summaryMonthSelect.appendChild(summaryOption);
                 });
                 monthSelect.value = now.getMonth() + 1;
                 
                 // Populate years
                 const currentYear = now.getFullYear();
-                for (let i = currentYear - 1; i <= currentYear + 2; i++) {
+                for (let i = currentYear - 2; i <= currentYear + 2; i++) {
                     const option = document.createElement('option');
                     option.value = i;
                     option.textContent = i;
@@ -922,33 +1094,7 @@
                     savedYearSelect.appendChild(savedOption);
                 }
                 yearSelect.value = currentYear;
-            }
-            
-            // Update summary filters with available stores
-            function updateSummaryFilters() {
-                // Clear existing store options except "All"
-                while (summaryStoreSelect.options.length > 1) {
-                    summaryStoreSelect.remove(1);
-                }
-                
-                // Get unique stores from saved lists
-                const stores = new Set();
-                const listKeys = Object.keys(localStorage).filter(key => key.startsWith('groceryList-'));
-                
-                listKeys.forEach(key => {
-                    const listData = JSON.parse(localStorage.getItem(key));
-                    if (listData.supermarket) {
-                        stores.add(listData.supermarket);
-                    }
-                });
-                
-                // Add store options
-                stores.forEach(store => {
-                    const option = document.createElement('option');
-                    option.value = store;
-                    option.textContent = store;
-                    summaryStoreSelect.appendChild(option);
-                });
+                summaryYearSelect.value = currentYear;
             }
             
             // Update saved list filters
@@ -978,6 +1124,11 @@
                 });
             }
             
+            // Update summary filters
+            function updateSummaryFilters() {
+                // Nothing needed here for now
+            }
+            
             // Show notification
             function showNotification(message) {
                 notificationText.textContent = message;
@@ -986,6 +1137,18 @@
                 setTimeout(() => {
                     notification.classList.remove('show');
                 }, 2000);
+            }
+            
+            // Show loading state on a button
+            function showLoading(button) {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<div class="loading"></div> Processing...';
+                button.disabled = true;
+                
+                return () => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                };
             }
             
             // Switch between tabs
@@ -1464,9 +1627,7 @@
             // Generate summary reports
             function generateSummary() {
                 // Get filter values
-                const monthFilter = summaryMonthSelect.value;
                 const yearFilter = summaryYearSelect.value;
-                const storeFilter = summaryStoreSelect.value;
                 
                 // Get all saved lists
                 const listKeys = Object.keys(localStorage).filter(key => key.startsWith('groceryList-'));
@@ -1474,27 +1635,40 @@
                 // Initialize summary data
                 const monthlyData = {};
                 const storeData = {};
+                const yearlyData = {
+                    total: 0,
+                    lists: 0,
+                    stores: new Set(),
+                    items: 0,
+                    previousYearTotal: 0
+                };
                 
                 // Process each list
                 listKeys.forEach(key => {
                     const listData = JSON.parse(localStorage.getItem(key));
                     
                     // Apply filters
-                    if (monthFilter !== 'all' && listData.month != monthFilter) return;
                     if (yearFilter !== 'all' && listData.year != yearFilter) return;
-                    if (storeFilter !== 'all' && listData.supermarket !== storeFilter) return;
                     
                     // Calculate total for this list
                     let listTotal = 0;
+                    let listItems = 0;
                     if (listData.items && Array.isArray(listData.items)) {
                         listData.items.forEach(item => {
                             if (!item.completed) {
                                 const total = item.quantity * item.rate;
                                 const gstAmt = total * (item.gst / 100);
                                 listTotal += total + gstAmt;
+                                listItems += item.quantity;
                             }
                         });
                     }
+                    
+                    // Update yearly data
+                    yearlyData.total += listTotal;
+                    yearlyData.lists += 1;
+                    yearlyData.stores.add(listData.supermarket);
+                    yearlyData.items += listItems;
                     
                     // Update monthly data
                     const monthKey = `${listData.month}-${listData.year}`;
@@ -1520,6 +1694,44 @@
                     storeData[storeName].count += 1;
                 });
                 
+                // Calculate previous year data for comparison
+                if (yearFilter !== 'all') {
+                    const previousYear = parseInt(yearFilter) - 1;
+                    listKeys.forEach(key => {
+                        const listData = JSON.parse(localStorage.getItem(key));
+                        if (listData.year == previousYear) {
+                            if (listData.items && Array.isArray(listData.items)) {
+                                listData.items.forEach(item => {
+                                    if (!item.completed) {
+                                        const total = item.quantity * item.rate;
+                                        const gstAmt = total * (item.gst / 100);
+                                        yearlyData.previousYearTotal += total + gstAmt;
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+                
+                // Update yearly summary
+                yearlyTotal.textContent = `₹${yearlyData.total.toFixed(2)}`;
+                yearlyLists.textContent = yearlyData.lists;
+                yearlyStores.textContent = yearlyData.stores.size;
+                yearlyItems.textContent = yearlyData.items;
+                
+                // Update yearly comparison
+                if (yearlyData.previousYearTotal > 0) {
+                    const change = yearlyData.total - yearlyData.previousYearTotal;
+                    const percentChange = (change / yearlyData.previousYearTotal) * 100;
+                    const changeText = change >= 0 ? 
+                        `↑ ₹${Math.abs(change).toFixed(2)} (${Math.abs(percentChange).toFixed(1)}% increase from previous year)` :
+                        `↓ ₹${Math.abs(change).toFixed(2)} (${Math.abs(percentChange).toFixed(1)}% decrease from previous year)`;
+                    
+                    yearlyComparisonText.textContent = changeText;
+                } else {
+                    yearlyComparisonText.textContent = 'No previous year data';
+                }
+                
                 // Update monthly summary table
                 summaryTableBody.innerHTML = '';
                 
@@ -1535,9 +1747,9 @@
                     Object.values(monthlyData).forEach(data => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${months[data.month - 1]} ${data.year}</td>
-                            <td>${data.store}</td>
-                            <td>₹${data.total.toFixed(2)}</td>
+                            <td class="left-align">${months[data.month - 1]} ${data.year}</td>
+                            <td class="center-align">${data.store}</td>
+                            <td class="right-align number-cell">₹${data.total.toFixed(2)}</td>
                         `;
                         summaryTableBody.appendChild(row);
                     });
@@ -1556,13 +1768,243 @@
                     Object.entries(storeData).forEach(([store, data]) => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${store}</td>
-                            <td>₹${data.total.toFixed(2)}</td>
-                            <td>${data.count}</td>
+                            <td class="left-align">${store}</td>
+                            <td class="right-align number-cell">₹${data.total.toFixed(2)}</td>
+                            <td class="right-align number-cell">${data.count}</td>
                         `;
                         storeSummaryBody.appendChild(row);
                     });
                 }
+            }
+            
+            // Export to PDF function
+            function exportToPdf() {
+                const restoreLoading = showLoading(exportPdfBtn);
+                
+                setTimeout(() => {
+                    // Get all saved lists
+                    const listKeys = Object.keys(localStorage).filter(key => key.startsWith('groceryList-'));
+                    
+                    // Apply filters
+                    const yearFilter = savedYearSelect.value;
+                    const storeFilter = savedStoreSelect.value;
+                    
+                    const filteredKeys = listKeys.filter(key => {
+                        const listData = JSON.parse(localStorage.getItem(key));
+                        
+                        if (yearFilter !== 'all' && listData.year != yearFilter) return false;
+                        if (storeFilter !== 'all' && listData.supermarket !== storeFilter) return false;
+                        
+                        return true;
+                    });
+                    
+                    if (filteredKeys.length === 0) {
+                        showMessage('No data to export', true);
+                        restoreLoading();
+                        return;
+                    }
+                    
+                    // Create PDF document
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    // Add title
+                    doc.setFontSize(18);
+                    doc.setTextColor(40);
+                    doc.text('Grocery List Manager - Saved Lists', 14, 22);
+                    
+                    // Add date
+                    doc.setFontSize(10);
+                    doc.setTextColor(100);
+                    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+                    
+                    // Add filters info
+                    doc.text(`Year: ${yearFilter === 'all' ? 'All' : yearFilter}, Store: ${storeFilter === 'all' ? 'All' : storeFilter}`, 14, 36);
+                    
+                    // Prepare table data
+                    const tableData = [];
+                    let totalAmount = 0;
+                    let totalVisits = 0;
+                    
+                    filteredKeys.forEach(key => {
+                        const listData = JSON.parse(localStorage.getItem(key));
+                        const savedDate = new Date(listData.savedAt);
+                        const formattedDate = savedDate.toLocaleDateString();
+                        
+                        // Calculate list total
+                        let listTotal = 0;
+                        if (listData.items && Array.isArray(listData.items)) {
+                            listData.items.forEach(item => {
+                                if (!item.completed) {
+                                    const total = item.quantity * item.rate;
+                                    const gstAmt = total * (item.gst / 100);
+                                    listTotal += total + gstAmt;
+                                }
+                            });
+                        }
+                        
+                        tableData.push([
+                            formattedDate,
+                            listData.listName || 'Unnamed List',
+                            listData.supermarket || 'Unknown Store',
+                            `₹${listTotal.toFixed(2)}`,
+                            listData.items ? listData.items.length : 0
+                        ]);
+                        
+                        totalAmount += listTotal;
+                        totalVisits += 1;
+                    });
+                    
+                    // Add summary row
+                    tableData.push([
+                        'TOTAL',
+                        '',
+                        '',
+                        `₹${totalAmount.toFixed(2)}`,
+                        totalVisits
+                    ]);
+                    
+                    // Create table
+                    doc.autoTable({
+                        head: [['Date', 'List Name', 'Store', 'Total Amount', 'Items']],
+                        body: tableData,
+                        startY: 40,
+                        theme: 'grid',
+                        headStyles: {
+                            fillColor: [76, 175, 80],
+                            textColor: 255,
+                            fontStyle: 'bold'
+                        },
+                        footStyles: {
+                            fillColor: [76, 175, 80],
+                            textColor: 255,
+                            fontStyle: 'bold'
+                        },
+                        alternateRowStyles: {
+                            fillColor: [240, 240, 240]
+                        },
+                        styles: {
+                            fontSize: 10,
+                            cellPadding: 3,
+                            valign: 'middle'
+                        },
+                        columnStyles: {
+                            0: { cellWidth: 30 },
+                            1: { cellWidth: 40 },
+                            2: { cellWidth: 40 },
+                            3: { cellWidth: 30, halign: 'right' },
+                            4: { cellWidth: 20, halign: 'right' }
+                        }
+                    });
+                    
+                    // Save the PDF
+                    doc.save('grocery_lists_export.pdf');
+                    
+                    restoreLoading();
+                    showNotification('PDF exported successfully!');
+                }, 500);
+            }
+            
+            // Export to Excel function
+            function exportToExcel() {
+                const restoreLoading = showLoading(exportExcelBtn);
+                
+                setTimeout(() => {
+                    // Get all saved lists
+                    const listKeys = Object.keys(localStorage).filter(key => key.startsWith('groceryList-'));
+                    
+                    // Apply filters
+                    const yearFilter = savedYearSelect.value;
+                    const storeFilter = savedStoreSelect.value;
+                    
+                    const filteredKeys = listKeys.filter(key => {
+                        const listData = JSON.parse(localStorage.getItem(key));
+                        
+                        if (yearFilter !== 'all' && listData.year != yearFilter) return false;
+                        if (storeFilter !== 'all' && listData.supermarket !== storeFilter) return false;
+                        
+                        return true;
+                    });
+                    
+                    if (filteredKeys.length === 0) {
+                        showMessage('No data to export', true);
+                        restoreLoading();
+                        return;
+                    }
+                    
+                    // Prepare worksheet data
+                    const worksheetData = [
+                        ['Grocery List Manager - Saved Lists'],
+                        [`Generated on: ${new Date().toLocaleDateString()}`],
+                        [`Year: ${yearFilter === 'all' ? 'All' : yearFilter}, Store: ${storeFilter === 'all' ? 'All' : storeFilter}`],
+                        [],
+                        ['Date', 'List Name', 'Store', 'Total Amount', 'Items']
+                    ];
+                    
+                    let totalAmount = 0;
+                    let totalVisits = 0;
+                    
+                    filteredKeys.forEach(key => {
+                        const listData = JSON.parse(localStorage.getItem(key));
+                        const savedDate = new Date(listData.savedAt);
+                        const formattedDate = savedDate.toLocaleDateString();
+                        
+                        // Calculate list total
+                        let listTotal = 0;
+                        if (listData.items && Array.isArray(listData.items)) {
+                            listData.items.forEach(item => {
+                                if (!item.completed) {
+                                    const total = item.quantity * item.rate;
+                                    const gstAmt = total * (item.gst / 100);
+                                    listTotal += total + gstAmt;
+                                }
+                            });
+                        }
+                        
+                        worksheetData.push([
+                            formattedDate,
+                            listData.listName || 'Unnamed List',
+                            listData.supermarket || 'Unknown Store',
+                            listTotal,
+                            listData.items ? listData.items.length : 0
+                        ]);
+                        
+                        totalAmount += listTotal;
+                        totalVisits += 1;
+                    });
+                    
+                    // Add summary row
+                    worksheetData.push([
+                        'TOTAL',
+                        '',
+                        '',
+                        totalAmount,
+                        totalVisits
+                    ]);
+                    
+                    // Create workbook and worksheet
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+                    
+                    // Set column widths
+                    const colWidths = [
+                        { wch: 15 }, // Date
+                        { wch: 25 }, // List Name
+                        { wch: 20 }, // Store
+                        { wch: 15 }, // Total Amount
+                        { wch: 10 }  // Items
+                    ];
+                    ws['!cols'] = colWidths;
+                    
+                    // Add worksheet to workbook
+                    XLSX.utils.book_append_sheet(wb, ws, 'Saved Lists');
+                    
+                    // Save the Excel file
+                    XLSX.writeFile(wb, 'grocery_lists_export.xlsx');
+                    
+                    restoreLoading();
+                    showNotification('Excel file exported successfully!');
+                }, 500);
             }
             
             // Initialize the app
